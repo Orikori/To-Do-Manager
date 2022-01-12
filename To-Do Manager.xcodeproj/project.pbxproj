@@ -13,6 +13,8 @@
 		EED69A3D278DE1EA0086FFD6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EED69A3C278DE1EA0086FFD6 /* Assets.xcassets */; };
 		EED69A40278DE1EA0086FFD6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EED69A3E278DE1EA0086FFD6 /* LaunchScreen.storyboard */; };
 		EED69A48278F1DDA0086FFD6 /* TaskListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED69A47278F1DDA0086FFD6 /* TaskListController.swift */; };
+		EED69A4B278F1F630086FFD6 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED69A4A278F1F630086FFD6 /* Task.swift */; };
+		EED69A4D278F22350086FFD6 /* TasksStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED69A4C278F22350086FFD6 /* TasksStorage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		EED69A3F278DE1EA0086FFD6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		EED69A41278DE1EA0086FFD6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EED69A47278F1DDA0086FFD6 /* TaskListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskListController.swift; sourceTree = "<group>"; };
+		EED69A4A278F1F630086FFD6 /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		EED69A4C278F22350086FFD6 /* TasksStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksStorage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,11 +64,21 @@
 				EED69A35278DE1E70086FFD6 /* SceneDelegate.swift */,
 				EED69A39278DE1E70086FFD6 /* Main.storyboard */,
 				EED69A3C278DE1EA0086FFD6 /* Assets.xcassets */,
+				EED69A49278F1F3F0086FFD6 /* Model */,
 				EED69A3E278DE1EA0086FFD6 /* LaunchScreen.storyboard */,
 				EED69A41278DE1EA0086FFD6 /* Info.plist */,
 				EED69A47278F1DDA0086FFD6 /* TaskListController.swift */,
 			);
 			path = "To-Do Manager";
+			sourceTree = "<group>";
+		};
+		EED69A49278F1F3F0086FFD6 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				EED69A4A278F1F630086FFD6 /* Task.swift */,
+				EED69A4C278F22350086FFD6 /* TasksStorage.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -138,7 +152,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EED69A4B278F1F630086FFD6 /* Task.swift in Sources */,
 				EED69A34278DE1E70086FFD6 /* AppDelegate.swift in Sources */,
+				EED69A4D278F22350086FFD6 /* TasksStorage.swift in Sources */,
 				EED69A36278DE1E70086FFD6 /* SceneDelegate.swift in Sources */,
 				EED69A48278F1DDA0086FFD6 /* TaskListController.swift in Sources */,
 			);
