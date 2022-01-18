@@ -11,8 +11,21 @@ class TaskListController: UITableViewController {
     
     // хранилище задач
     var tasksStorage: TasksStorageProtocol = TasksStorage()
+    
     // коллекция задач
-    var tasks: [TaskPriority:[TaskProtocol]] = [:]
+    var tasks: [TaskPriority:[TaskProtocol]] = [:] {
+        didSet {
+            for (tasksGroupPriority, tasksGroup) in tasks {
+                tasks[tasksGroupPriority] = tasksGroup.sorted{ task1, task2 in
+                    let task1position = tasksStatusPosition.firstIndex(of: task1.status) ?? 0
+                    let task2position = tasksStatusPosition.firstIndex(of: task2.status) ?? 0
+                    return task1position < task2position
+                    
+                }
+            }
+            
+        }
+    }
     
     // порядок отображения задач по их статусу
     var tasksStatusPosition: [TaskStatus] = [.planned, .completed]
@@ -25,6 +38,8 @@ class TaskListController: UITableViewController {
         super.viewDidLoad()
         
         loadTasks()
+        
+        navigationItem.leftBarButtonItem = editButtonItem
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -45,17 +60,6 @@ class TaskListController: UITableViewController {
             
         }
         
-        // сортировка списка задач
-        for (tasksGroupPriority, tasksGroup) in tasks {
-            tasks[tasksGroupPriority] = tasksGroup.sorted { task1, task2 in
-                let task1position = tasksStatusPosition.firstIndex(of: task1.status)
-                ?? 0
-                let task2position = tasksStatusPosition.firstIndex(of: task2.status)
-                ?? 0
-                return task1position < task2position
-            }
-            
-        }
     }
     
     // MARK: - Table view data source
@@ -80,7 +84,7 @@ class TaskListController: UITableViewController {
     
     // ячейка для строки таблицы
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        return getConfiguredTaskCell_constraints(for: indexPath)
+        //        return getConfiguredTaskCell_constraints(for: indexPath)
         return getConfiguredTaskCell_stack(for: indexPath)
         
     }
@@ -151,9 +155,9 @@ class TaskListController: UITableViewController {
             cell.symbol.textColor = .black
             
         } else {
-                cell.title.textColor = .lightGray
-                cell.symbol.textColor = .lightGray
-            }
+            cell.title.textColor = .lightGray
+            cell.symbol.textColor = .lightGray
+        }
         return cell
         
     }
@@ -171,6 +175,92 @@ class TaskListController: UITableViewController {
             
         }
         return resultSymbol
+        
+    }
+    
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // 1. Проверяем существование задачи
+        let taskType = sectionsTypesPosition[indexPath.section]
+        guard let _ = tasks[taskType]?[indexPath.row] else {
+            return
+            
+        }
+        // 2. Убеждаемся, что задача не является выполненной
+        guard tasks[taskType]![indexPath.row].status == .planned else {
+            // снимаем выделение со строки
+            tableView.deselectRow(at: indexPath, animated: true)
+            return
+        }
+        // 3. Отмечаем задачу как выполненную
+        tasks[taskType]![indexPath.row].status = .completed
+        // 4. Перезагружаем секцию таблицы
+        tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section),
+                                 with: .automatic
+        )
+        
+    }
+    
+    
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        // получаем данные о задаче, которую необходимо перевести в статус "за- планирована"
+        let taskType = sectionsTypesPosition[indexPath.section]
+        guard let _ = tasks[taskType]?[indexPath.row] else {
+            return nil
+            
+        }
+        // проверяем, что задача имеет статус "выполнено"
+        guard tasks[taskType]![indexPath.row].status == .completed else {
+            return nil
+            
+        }
+        // создаем действие для изменения статуса
+        let actionSwipeInstance = UIContextualAction(style: .normal, title: "Не выполнена") {
+            _,_,_ in
+            self.tasks[taskType]![indexPath.row].status = .planned
+            self.tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
+        }
+        // возвращаем настроенный объект
+        return UISwipeActionsConfiguration(actions: [actionSwipeInstance])
+    }
+    
+    
+    override func tableView(
+        _ tableView: UITableView,
+        commit editingStyle: UITableViewCell.EditingStyle,
+        forRowAt indexPath: IndexPath)
+    {
+        
+        
+        let taskType = sectionsTypesPosition[indexPath.section]
+        // удаляем задачу
+        tasks[taskType]?.remove(at: indexPath.row)
+        // удаляем строку, соответствующую задаче
+        tableView.deleteRows(at: [indexPath], with: .automatic)
+    }
+    
+    
+    
+    // ручная сортировка списка задач
+    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        // секция, из которой происходит перемещение
+        let taskTypeFrom = sectionsTypesPosition[sourceIndexPath.section]
+        // секция, в которую происходит перемещение
+        let taskTypeTo = sectionsTypesPosition[destinationIndexPath.section]
+        // безопасно извлекаем задачу, тем самым копируем ее
+        guard let movedTask = tasks[taskTypeFrom]?[sourceIndexPath.row] else {
+            return }
+        // удаляем задачу с места, от куда она перенесена
+        tasks[taskTypeFrom]!.remove(at: sourceIndexPath.row)
+        // вставляем задачу на новую позицию
+        tasks[taskTypeTo]!.insert(movedTask, at: destinationIndexPath.row)
+        // если секция изменилась, изменяем тип задачи в соответствии с новой позицией
+        if taskTypeFrom != taskTypeTo {
+            tasks[taskTypeTo]![destinationIndexPath.row].type = taskTypeTo
+            
+        }
+        // обновляем данные
+        tableView.reloadData()
         
     }
     
